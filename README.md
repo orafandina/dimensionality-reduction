@@ -26,3 +26,7 @@ The algorithm works in two steps:
 2. Next, we aplly the JL projection method to reuce the dimesnion of the output set from the first setp. We embed the vectors into $k$ - dimensions. 
 
 We give here the implementation for optimizing the lq_distortion, while optimizing for the other measures is done similarly.
+
+
+# Code Contributor 
+Ora Fandina
