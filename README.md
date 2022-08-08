@@ -5,16 +5,16 @@ The code below is the implementation of the approximation algorithm with provabl
 in our paper [Dimensionality Reduction: theoretical perspective on practical measures](https://proceedings.neurips.cc/paper/2019/file/94f4ede62112b790c91d5e64fdb09cb8-Paper.pdf), NeurIPS 2019. 
 <br>
 <br>
-The input to the algorithm is a finite metric space $\;X$, given by the matrix of the pairwise distances; an integer $\;k \geq 3$, denoting the target dimension; and parameter $\;q \geq 1$, denoting the desired moment in the loss function. 
+The input to the algorithm is a finite metric space $X$, given by the matrix of the pairwise distances; an integer $k \geq 3$, denoting the target dimension and parameter $q \geq 1$, denoting the desired moment in the loss function. 
 
-The algorithm computes an embedding $\;F: X \to \ell_2^k$ into a $\;k\;$- dimensional Euclidean space with 
+The algorithm computes an embedding $F: X \to \ell_2^k$ into a $k$- dimensional Euclidean space with 
 <br>
 <br>
 > $l_q$-distortion$(F) =(1+O(q/k))*OPT$
 
 <br>
 
-where $\;OPT\;$ is the $\;l_q$-distortion of the **optimal** embedding of $\;X$ into a $\;k\;$ - dimensional Euclidean space.
+where $OPT$ is the $l_q$-distortion of the **optimal** embedding of $X$ into a $k$ - dimensional Euclidean space.
 
 <br>  
 
