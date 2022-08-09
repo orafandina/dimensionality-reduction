@@ -27,6 +27,23 @@ The algorithm works in two steps:
 
 We give here the implementation for optimizing the lq_distortion, while optimizing for the other measures is done similarly.
 
+# Citation 
+If you use our implementation in your research, please cite our paper:
+
+```
+
+@inproceedings{BFN19,
+  title = {Dimensionality reduction: theoretical perspective on practical measures},
+  author = {Yair Bartal and Nova Fandina and Ofer Neiman},
+  year = {2019},
+  booktitle = {NeurIPS 2019},
+  }
+
+
+```
+
+
+
 
 # Code Contributor 
 Ora Fandina
