@@ -32,32 +32,36 @@ The algorithm works in two steps:
 
 We give here the implementation for optimizing the lq_distortion, while optimizing for the other measures is done similarly.
 
-## Metric Spaces 
+## Dependencies 
 
+``` pip install cvxpy ```
+
+
+## Metric Spaces 
+`Metric_Spaces.py` module is for working with metric spaces: randomly generating metric spaces, checking for being a valid metric space, for being a Euclidean and more.
 
 ## Distortion Measures
+`Distortion_Measures.py` contains implementation of various distortion measures of an embedding, e.g., $l_q$-distortion, $REM$ and more, as discussed in our paper. 
 
-
-## Running Tests
+## Tests
+This is the main file, contains experiments for reproducability of the results in the paper. 
 
 ## Jupyter notebook for a quck interaction with the code 
 
 The notebook version of the code, with step by step instructions is in `Embedding General Metrics into Low Dim Space.ipynb`.
 
 
+
 # Citation 
 If you use our implementation in your research, please cite our paper:
 
 ```
-
 @inproceedings{BFN19,
   title = {Dimensionality reduction: theoretical perspective on practical measures},
   author = {Yair Bartal and Nova Fandina and Ofer Neiman},
   year = {2019},
   booktitle = {NeurIPS 2019},
   }
-
-
 ```
 
 
