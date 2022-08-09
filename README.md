@@ -1,7 +1,7 @@
 # Dimensionality reduction with provable guarantees
 
 
-The code below is the implementation of the approximation algorithm with provable guarantees, as appears
+The code is the implementation of the approximation algorithm with provable guarantees, as appears
 in our paper [Dimensionality Reduction: theoretical perspective on practical measures](https://proceedings.neurips.cc/paper/2019/file/94f4ede62112b790c91d5e64fdb09cb8-Paper.pdf), NeurIPS 2019. 
 <br>
 <br>
