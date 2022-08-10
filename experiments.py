@@ -22,11 +22,10 @@ import numpy as np
 from numpy import linalg as LA
 import scipy
 import scipy.spatial
-import math
-import sys
+
 
 #convex opt package
-import cvxpy as cp
+
 
 #metric spaces and qaulit ymeasures of embedding methods
 import distortion_measures as dm
@@ -81,33 +80,44 @@ Inputs: input_dist - distance matrix of an input metric space
         q - distortion rank 
         
         measure_type - a string from {'lq_dist', 'REM', 'sigma'}
+        
+        embedding_type - a string from {'MDS', 'PCA', 'TSNE', 'Approx_Algo'}, an embedding to apply
+        
 """ 
 
-def run_MDS_range_k(input_dists, range_k, q, measure_type):
+def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_type):
     answer=np.zeros(range_k.shape)
     
-    dict={
+    measure_dict={
      'lq_dist': dm.lq_dist,
      'REM': dm.REM_q,
      'sigma': dm.sigma_q
     }
     
-    measure=dict[measure_type]
-    for i in len(range_k):
-        embedded=MDS_transf(input_dists,range_k[i])
+    measure=measure_dict[measure_type]
+    
+    embedding_dict={
+            'MDS': MDS_transf,
+            'PCA': PCA_transf,
+            'TSNE': TSNE_transf,
+            'Approx_Algo': AA.Approx_Algo
+    }
+    
+    embedding=embedding_dict[embedding_type]
+    print('Experiment: embedding with', embedding_type)
+    
+    for i in range(len(range_k)):
+        if (embedding_type=='Approx_Algo'):
+            embedded=embedding(input_dists,range_k[i],q)
+        else:
+            embedded=embedding(input_dists,range_k[i])
         answer[i]=measure(input_dists,ms.space_to_dist(embedded),q)
     return(answer)    
          
         
-X=ms.get_random_space(10, 10) 
-dists_X=ms.space_to_dist(X)   
-print(dists_X)     
-    
-    
+dists=ms.space_to_dist(ms.get_random_space(10,10))
+print(run_dim_range_experiment(dists, np.array([3,6,8]), 3, 'lq_dist', 'Approx_Algo'))    
         
-    
-
-
 #TSNE
 
 def run_TSNE_range_k(d, range_k, q, t, epsilon):
