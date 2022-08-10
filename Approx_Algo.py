@@ -77,7 +77,7 @@ def Approx_Algo(input_dists, new_dim, q):
     U_matrix=np.transpose(eig_vectors)
     the_vectors=np.matmul(D_matrix, U_matrix)
 
-    #The original vectors are the cols of the above matrix.
+    #The original vectors are the cols of the above matrix.ss
     recov_vecs=np.transpose(the_vectors)
 
     #The assumption is that the first vector is mapped to 0 vector. So we bring it back.
