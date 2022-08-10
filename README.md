@@ -44,7 +44,7 @@ We give here the implementation for optimizing the lq_distortion, while optimizi
 `distortion_measures.py` contains implementation of various distortion measures of an embedding, e.g., $l_q$-distortion, $REM$ and more, as discussed in our paper. 
 
 ## Experiments
-`metric_spaces.py` contains experiments for reproducability of the results in the paper. 
+`experiments.py` contains experiments for reproducability of the results in the paper. 
 
 ## Jupyter notebook for a quck interaction with the code 
 
