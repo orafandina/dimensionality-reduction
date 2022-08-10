@@ -6,9 +6,9 @@ Created on Wed August 10 13:15:37 2022
 @author: Ora Fandina
 """
 import matplotlib.pyplot as plt
-import sklearn
 
-sklearn.__file__
+
+
 
 #Classic embedding methods, to compare with
 from sklearn.random_projection import GaussianRandomProjection
