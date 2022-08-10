@@ -8,7 +8,7 @@ in our paper [Dimensionality Reduction: theoretical perspective on practical mea
 
 ## Approximation Algorithm 
 
-The algorithm is implemented in `Approx_Algo.py`.
+The algorithm is implemented in `approx_algo.py`.
 The input to the algorithm is a finite metric space $X$, given by the matrix of the pairwise distances; an integer $k \geq 3$, denoting the target dimension and parameter $q \geq 1$, denoting the desired moment in the loss function. 
 
 The algorithm computes an embedding $F: X \to \ell_2^k$ into a $k$- dimensional Euclidean space with 
@@ -38,17 +38,17 @@ We give here the implementation for optimizing the lq_distortion, while optimizi
 
 
 ## Metric Spaces 
-`Metric_Spaces.py` module is for working with metric spaces: randomly generating metric spaces, checking for being a valid metric space, for being a Euclidean and more.
+`metric_spaces.py` module is for working with metric spaces: randomly generating metric spaces, checking for being a valid metric space, for being a Euclidean and more.
 
 ## Distortion Measures
-`Distortion_Measures.py` contains implementation of various distortion measures of an embedding, e.g., $l_q$-distortion, $REM$ and more, as discussed in our paper. 
+`distortion_measures.py` contains implementation of various distortion measures of an embedding, e.g., $l_q$-distortion, $REM$ and more, as discussed in our paper. 
 
 ## Tests
 This is the main file, contains experiments for reproducability of the results in the paper. 
 
 ## Jupyter notebook for a quck interaction with the code 
 
-The notebook version of the code, with step by step instructions is in `Embedding General Metrics into Low Dim Space.ipynb`.
+The notebook version of the code, with step by step instructions is in `Embedding.ipynb`.
 
 
 
