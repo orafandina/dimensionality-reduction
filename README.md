@@ -32,7 +32,7 @@ The algorithm works in two steps:
 
 We give here the implementation for optimizing the lq_distortion, while optimizing for the other measures is done similarly.
 
-## Dependencies 
+## Requirements
 
 ``` pip install cvxpy ```
 
