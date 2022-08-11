@@ -30,13 +30,14 @@ def is_metric_space(dists_matrix):
 def Gram_matrix_from_dists(dists):
     sq_dists=np.square(dists)
     [rows,cols]=sq_dists.shape
-    G_matrix=np.zeros((rows, cols))
-    for i in range(1,rows):
-        for j in range(1,cols):
-            G_matrix[i,j]=(1/2)*(sq_dists[0,i]+sq_dists[0,j]-sq_dists[i,j])
-    G_row_del=np.delete(G_matrix,0,0)
-    final_matrix=np.delete(G_row_del,0,1)
-    return(final_matrix)
+    sq_norms=sq_dists[0] #first row contains squared norms, i.e., distances from x_0=0 vector by assumption    
+    norms_matrix=np.tile(sq_norms, (rows, 1))
+    sum_norms=np.zeros((rows,cols))
+    for i in range(1,cols):
+        sum_norms[i]=np.copy(np.full(cols,sq_norms[i]))
+    G_matrix=(1/2)*(norms_matrix+sum_norms-sq_dists)
+    return(G_matrix)    
+    
 
 
 #Checks if the input matrix is positive semi definite
@@ -94,6 +95,11 @@ def get_random_space(size, dim):
         sdv=np.random.randint(1,30)
         space[i]=sdv*space[i]
     return(space);
+
+
+
+
+
 
 
 
