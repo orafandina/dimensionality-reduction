@@ -112,7 +112,7 @@ To reduce this probability we run the algorithm for several iterations (#iter.)
 
 NOTE: for some runs, the result of is_metric_space(output) can result in False, due to rounding issues. """
 
-
+"TODO: make it more efficient"
 
 def get_epsilon_close_metric(dists_matrix, epsilon, iter):
     copy_dists_matrix=np.copy(dists_matrix)
