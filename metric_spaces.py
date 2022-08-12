@@ -105,16 +105,21 @@ def get_random_space(size, dim):
 
 """ Generates a non-Euclidean metric space that is "epsilon-close" to a given Euclidean space. 
 
-Input: distance matrix of a given Euclidean metric space, numpy 2D array. Output: distance matrix of a non-Euclidean space, numpy 2D array
-The resulting metric space is epsilon close to the input space. The algorithm is randomized and it always outputs a valid metric space.
-There is some small probability that the output space is still Euclidean space (if the input space was Euclidean). 
-To reduce this probability we run the algorithm for several iterations (#iter.)
+Input: distance matrix of a given Euclidean metric space, numpy 2D array. 
+Output: distance matrix of a non-Euclidean space, numpy 2D array
+        The resulting metric space is an epsilon close to the input space, i.e., can be embedded into it with 
+        distortion 1+epsilon.
+        The algorithm is randomized and it always outputs a valid metric space.
+        
+        There is some small probability that the output space is still a Euclidean space 
+        (if the input space was Euclidean). 
+        To reduce this probability we run the algorithm for several iterations (# T)
 
 NOTE: for some runs, the result of is_metric_space(output) can result in False, due to rounding issues. """
 
 "TODO: make it more efficient"
 
-def get_epsilon_close_metric(dists_matrix, epsilon, iter):
+def get_epsilon_close_metric(dists_matrix, epsilon, T):
     copy_dists_matrix=np.copy(dists_matrix)
     [rows, cols]=dists_matrix.shape
 
@@ -138,7 +143,7 @@ def get_epsilon_close_metric(dists_matrix, epsilon, iter):
             r=copy_dists_matrix[i,j]
             Finish=False
             possible_new_dists=[]
-            for t in range(iter):
+            for t in range(T):
                 noise=np.random.normal(0, epsilon)
                 if (noise>=0):
                     factor=1+noise
