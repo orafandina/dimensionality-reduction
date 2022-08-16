@@ -24,7 +24,6 @@ import scipy
 import scipy.spatial
 
 
-#convex opt package
 
 
 #metric spaces and qaulit ymeasures of embedding methods
@@ -32,8 +31,41 @@ import distortion_measures as dm
 import metric_spaces as ms
 import approx_algo as AA
 
+import torch
+import torchvision
+
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
+
+"""  TO DO: 1. bring real data sets = MNIST, CIFAR and compare all these embeddings on these.
+            2. compare our embedding with PyME embedding?
+            3. Rewrite our approx algo using pytorch functionality, to speed it up. Currently it is not practical at all !""" 
 
 """ Setting up various embeddings  """
+
+
+"""Loading the MNIST data. Mnist_train and mnist_test are pytorch.Tensors after applying transform to Tensor """
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
+
+transform=transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.1307,), (0.3081,))])
+#MNIST train has 60 000 images with labels
+mnist_train = datasets.MNIST('data', train=True, download=True,transform=transform)
+#has 10 000 images with labels
+mnist_test = datasets.MNIST('../data', train=False, download=True, transform=transform)
+
+train_dl = DataLoader(mnist_train, batch_size=1, shuffle=True)# Init the loader, wich will enumerate over the whole data set in batches, where each batch consists of tupels, photo+label
+for i, (xb, yb) in enumerate(train_dl):             #each xb is a tensor containing bs rows, each row is a data point (tensor)
+    #xb = xb.to(device)
+    #yb = yb.to(device)
+    xb = xb.view(xb.size(0), -1) #this turns the batch of data into a tensor, containing bs rows each of length 28*28 (the photo)
+    xb=xb.numpy()
+    
+    
+ # COLLECT SOME POINTS INTO AN ARRAY . After apply one of these algos onto this array...   
+
+
+
 
 #Input: numpy array containing vectors of the space
 def JL_transf(space, k):
@@ -116,6 +148,6 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
          
         
 dists=ms.space_to_dist(ms.get_random_space(10,10))
-print(run_dim_range_experiment(dists, np.array([3,6,8]), 3, 'lq_dist', 'Approx_Algo'))    
+print(run_dim_range_experiment(dists, np.array([3,6,8]), 3, 'lq_dist', 'PCA'))    
         
 
