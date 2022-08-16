@@ -19,9 +19,8 @@ from sklearn.manifold import TSNE
 
 
 import numpy as np
-from numpy import linalg as LA
-import scipy
-import scipy.spatial
+
+
 
 
 
@@ -31,69 +30,41 @@ import distortion_measures as dm
 import metric_spaces as ms
 import approx_algo as AA
 
-import torch
-import torchvision
 
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
-
-"""  TO DO: 1. bring real data sets = MNIST, CIFAR and compare all these embeddings on these.
-            2. compare our embedding with PyME embedding?
-            3. Rewrite our approx algo using pytorch functionality, to speed it up. Currently it is not practical at all !""" 
 
 """ Setting up various embeddings  """
 
 
-"""Loading the MNIST data. Mnist_train and mnist_test are pytorch.Tensors after applying transform to Tensor """
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
-
-transform=transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.1307,), (0.3081,))])
-#MNIST train has 60 000 images with labels
-mnist_train = datasets.MNIST('data', train=True, download=True,transform=transform)
-#has 10 000 images with labels
-mnist_test = datasets.MNIST('../data', train=False, download=True, transform=transform)
-
-train_dl = DataLoader(mnist_train, batch_size=1, shuffle=True)# Init the loader, wich will enumerate over the whole data set in batches, where each batch consists of tupels, photo+label
-for i, (xb, yb) in enumerate(train_dl):             #each xb is a tensor containing bs rows, each row is a data point (tensor)
-    #xb = xb.to(device)
-    #yb = yb.to(device)
-    xb = xb.view(xb.size(0), -1) #this turns the batch of data into a tensor, containing bs rows each of length 28*28 (the photo)
-    xb=xb.numpy()
-    
-    
- # COLLECT SOME POINTS INTO AN ARRAY . After apply one of these algos onto this array...   
 
 
+""" Input: 
+          space: numpy array containing vectors of the space
+          k: int, number of dimensions to embed into
+         
+    Returns: 
+         embedded vector space """
 
-
-#Input: numpy array containing vectors of the space
 def JL_transf(space, k):
     transformer = GaussianRandomProjection(k)
-    result=transformer.fit_transform(space)
-    return(result)
+    return transformer.fit_transform(space)
 
 
-#Input: numpy array containing vectors of the space
 def PCA_transf(space, k):
     transformer = PCA(n_components=k, whiten = False,svd_solver='full')
-    result=transformer.fit_transform(space)
-    return(result)
+    return transformer.fit_transform(space)
 
-#Input: distance matrix (not necessarily Euclidean) 
-#Output:embeded vectors in k dimesnions
+
 def MDS_transf(original_dists,k):
     transformer=MDS(n_components=k,dissimilarity='precomputed')
-    result=transformer.fit_transform(original_dists)
-    return(result)
+    return transformer.fit_transform(original_dists)
 
 
-#Input: distance matrix (not necessarily Euclidean) 
-#Output:embeded vectors in k dimesnions
-def TSNE_transf(dists, k):
-    transformer=TSNE(n_components=k, metric='precomputed', method='exact')
-    result=transformer.fit_transform(dists)
-    return(result)
+
+def TSNE_transf(space, k, T=10, measure_type, q):
+    transformer = TSNE(n_components=k, metric='precomputed', method='exact')
+    return transformer.fit_transform(space)
+
+
 
 
 
@@ -103,9 +74,9 @@ def TSNE_transf(dists, k):
 
 """   
 
-Applies MDS embedidng om input_dists. embeds into dimesnions in range_k array. Computes distortion of rank q.
+Applies an embedidng on input_dists. Embeds into dimesnions in range_k array. Computes distortion of rank q.
 
-Inputs: input_dist - distance matrix of an input metric space
+Inputs: input_dist - distance matrix of an input metric space 
  
         range_k - n array of dimesnions to embed into 
         
@@ -113,7 +84,7 @@ Inputs: input_dist - distance matrix of an input metric space
         
         measure_type - a string from {'lq_dist', 'REM', 'sigma'}
         
-        embedding_type - a string from {'MDS', 'PCA', 'TSNE', 'Approx_Algo'}, an embedding to apply
+        embedding_type - a string from {'MDS', 'PCA', 'TSNE', 'JL', 'Approx_Algo'}, an embedding to apply
         
 """ 
 
@@ -132,11 +103,16 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
             'MDS': MDS_transf,
             'PCA': PCA_transf,
             'TSNE': TSNE_transf,
+            'JL': JL_transf,
             'Approx_Algo': AA.Approx_Algo
     }
     
     embedding=embedding_dict[embedding_type]
     print('Experiment: embedding with', embedding_type)
+    
+    if(embedding_type=='PCA' or embedding_type=='JL' or embedding_type=='TSNE'):
+        input_space=ms.space_from_dists(input_dists)
+    
     
     for i in range(len(range_k)):
         if (embedding_type=='Approx_Algo'):
@@ -146,6 +122,9 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
         answer[i]=measure(input_dists,ms.space_to_dist(embedded),q)
     return(answer)    
          
+
+# Plotting the results 
+
         
 dists=ms.space_to_dist(ms.get_random_space(10,10))
 print(run_dim_range_experiment(dists, np.array([3,6,8]), 3, 'lq_dist', 'PCA'))    

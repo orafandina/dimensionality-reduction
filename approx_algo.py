@@ -10,6 +10,19 @@ def JL_transf(space, k):
     return(result)
 
 
+""" 
+Input: 
+    
+    input_dists: 2D array containing pairwise distances of metric space to embed
+    
+    new_dim: int, a number of dimensions to embed into
+    
+    q: int, the rank of measure objective
+    
+Returns vectors in the new dimensions, preserving pairwise distances on average.  
+
+"""
+
 def Approx_Algo(input_dists, new_dim, q):
     [rows, cols]=input_dists.shape
     #Step1: convex optimization
@@ -90,7 +103,7 @@ def Approx_Algo(input_dists, new_dim, q):
     #Step 2: embed the high dimimensional vectors into vectors of dimension new_dim, with the JL projection.
     #Output is the set of k-dimensional vectors.
  
-
+  
     low_dim_space=JL_transf(vectors, new_dim)
 
     #Bring the normalization factor back.

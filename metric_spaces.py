@@ -72,6 +72,16 @@ def space_to_dist(space):
     return (matrix_dist);
 
 
+""" Input: 
+    
+           input_dists: pairwise distances, assumed to be Euclidean distances
+           
+   Returns the metric space, such that input_dists is its pairwise Euclidean distance matrix."""
+def space_from_dists(input_dists):
+    return 
+
+
+
 def infty_space_to_dist(space):
     dist=scipy.spatial.distance.pdist(space,metric='chebyshev')
     matrix_dist=scipy.spatial.distance.squareform(dist)
