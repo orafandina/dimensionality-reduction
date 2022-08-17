@@ -98,7 +98,7 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
     }
     
     measure=measure_dict[measure_type]
-    
+   
     embedding_dict={
             'PCA': PCA_transf,
             'TSNE': TSNE_transf,
@@ -114,13 +114,14 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
         distortion=0
         for i in range(len(range_k)):
             for t in range(T):
-              distortion+=measure(input_dists, ms.space_to_dists(embedding(input_space, range_k[i])),q)  
-            answer[i]=distortion/T    
+              distortion+=measure(input_dists, ms.space_to_dist(embedding(input_space, range_k[i])),q)  
+            answer[i]=distortion/T
+         
             
     else:
         distortion=0
         for i in range(len(range_k)):
-            answer[i]=measure(input_dists, ms.space_to_dists(embedding(input_dists, range_k[i])),q)
+            answer[i]=measure(input_dists, ms.space_to_dist(embedding(input_dists, range_k[i],q)),q)
     return(answer)    
          
 
@@ -128,6 +129,6 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
 
         
 dists=ms.space_to_dist(ms.get_random_space(10,10))
-print(run_dim_range_experiment(dists, np.array([3,6,8]), 3, 'lq_dist', 'PCA'))    
+print(run_dim_range_experiment(dists, np.array([3,6,8]), 3, 'lq_dist', 'JL'))    
         
 
