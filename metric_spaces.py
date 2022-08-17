@@ -78,11 +78,9 @@ def space_to_dist(space):
            
    Returns the metric space, such that input_dists is its pairwise Euclidean distance matrix."""
 def space_from_dists(input_dists):
-    
     eig_vals, eig_vectors=np.linalg.eigh(input_dists)
     sqrt_eigs=np.sqrt(eig_vals)
     D_matrix=np.diag(sqrt_eigs)
-    
     #The rows of U should be the orthonormal basis of the eig_vectors.
     U_matrix=np.transpose(eig_vectors)
     the_vectors=np.matmul(D_matrix, U_matrix)
