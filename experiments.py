@@ -54,13 +54,9 @@ def PCA_transf(space, k):
     return transformer.fit_transform(space)
 
 
-def MDS_transf(original_dists,k):
-    transformer=MDS(n_components=k,dissimilarity='precomputed')
-    return transformer.fit_transform(original_dists)
 
 
-
-def TSNE_transf(space, k, T=10, measure_type, q):
+def TSNE_transf(space, k):
     transformer = TSNE(n_components=k, metric='precomputed', method='exact')
     return transformer.fit_transform(space)
 
@@ -84,12 +80,16 @@ Inputs: input_dist - distance matrix of an input metric space
         
         measure_type - a string from {'lq_dist', 'REM', 'sigma'}
         
-        embedding_type - a string from {'MDS', 'PCA', 'TSNE', 'JL', 'Approx_Algo'}, an embedding to apply
+        embedding_type - a string from {'PCA', 'TSNE', 'JL', 'Approx_Algo'}, an embedding to apply
         
 """ 
 
-def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_type):
+
+
+
+def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_type, T=10):
     answer=np.zeros(range_k.shape)
+    
     
     measure_dict={
      'lq_dist': dm.lq_dist,
@@ -100,7 +100,6 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
     measure=measure_dict[measure_type]
     
     embedding_dict={
-            'MDS': MDS_transf,
             'PCA': PCA_transf,
             'TSNE': TSNE_transf,
             'JL': JL_transf,
@@ -110,16 +109,18 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
     embedding=embedding_dict[embedding_type]
     print('Experiment: embedding with', embedding_type)
     
-    if(embedding_type=='PCA' or embedding_type=='JL' or embedding_type=='TSNE'):
+    if (embedding_type=='PCA' or embedding_type=='JL' or embedding_type=='TSNE'):
         input_space=ms.space_from_dists(input_dists)
-    
-    
-    for i in range(len(range_k)):
-        if (embedding_type=='Approx_Algo'):
-            embedded=embedding(input_dists,range_k[i],q)
-        else:
-            embedded=embedding(input_dists,range_k[i])
-        answer[i]=measure(input_dists,ms.space_to_dist(embedded),q)
+        distortion=0
+        for i in range(len(range_k)):
+            for t in range(T):
+              distortion+=measure(input_dists, ms.space_to_dists(embedding(input_space, range_k[i])),q)  
+            answer[i]=distortion/T    
+            
+    else:
+        distortion=0
+        for i in range(len(range_k)):
+            answer[i]=measure(input_dists, ms.space_to_dists(embedding(input_dists, range_k[i])),q)
     return(answer)    
          
 

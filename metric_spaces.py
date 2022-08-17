@@ -87,7 +87,7 @@ def space_from_dists(input_dists):
     U_matrix=np.transpose(eig_vectors)
     the_vectors=np.matmul(D_matrix, U_matrix)
     #The original vectors are the cols of the above matrix.ss
-    return (np.transpose(the_vectors)
+    return(np.transpose(the_vectors))
     
  
 
