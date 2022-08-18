@@ -21,11 +21,9 @@ def is_metric_space(dists_matrix):
                     return(False)
     return(True)
    
-
-
-
-"Checking whether an input space is Euclidean."
-
+   
+ 
+ 
 # Constructs the gram matrix from the distance matrix, for checking PSD
 def Gram_matrix_from_dists(dists):
     sq_dists=np.square(dists)
@@ -42,25 +40,35 @@ def Gram_matrix_from_dists(dists):
 
 #Checks if the input matrix is positive semi definite
 def is_pos_def(X):
+    print(np.linalg.eigvalsh(X))
     return (np.all(np.linalg.eigvalsh(X) >= 0));
 
+
+
+"Checking whether an input space is Euclidean."
 
 #input: distance matrix
 def is_Euclidean_space(dists):
     return(is_pos_def(Gram_matrix_from_dists(dists))) 
   
+""" 
+Returns the metric space, such that input_dists is its pairwise Euclidean distance matrix.
+Input: 
     
-   
-# Recovers the original vectors from the distance matrix (if such exist). 
-def isom_Eucl_embedding(dists):
-    G_matrix=Gram_matrix_from_dists(dists)
-    if(~(is_pos_def(G_matrix))):
-        return(None)
-    L=np.linalg.cholesky(G_matrix)
-    original_vectors=np.vstack([np.zeros(np.shape(L)[1]),L])
-    return(original_vectors);    
-  
-
+input_dists: pairwise distances, assumed to be Euclidean distances
+           
+ """
+ def space_from_dists(input_dists):
+    Gram=Gram_matrix_from_dists(input_dists)
+    eig_vals, eig_vectors=np.linalg.eigh(Gram)
+    sqrt_eigs=np.sqrt(eig_vals)
+    D_matrix=np.diag(sqrt_eigs)
+    #The rows of U should be the orthonormal basis of the eig_vectors.
+    U_matrix=np.transpose(eig_vectors)
+    the_vectors=np.matmul(D_matrix, U_matrix)
+    #The original vectors are the cols of the above matrix.ss
+    return np.transpose(the_vectors); 
+ 
 
 "Computing l_p distance matrices, from a given vector space/"
 
@@ -72,22 +80,8 @@ def space_to_dist(space):
     return (matrix_dist);
 
 
-""" Input: 
-    
-           input_dists: pairwise distances, assumed to be Euclidean distances
-           
-   Returns the metric space, such that input_dists is its pairwise Euclidean distance matrix."""
-def space_from_dists(input_dists):
-    eig_vals, eig_vectors=np.linalg.eigh(input_dists)
-    sqrt_eigs=np.sqrt(eig_vals)
-    D_matrix=np.diag(sqrt_eigs)
-    #The rows of U should be the orthonormal basis of the eig_vectors.
-    U_matrix=np.transpose(eig_vectors)
-    the_vectors=np.matmul(D_matrix, U_matrix)
-    #The original vectors are the cols of the above matrix.ss
-    return(np.transpose(the_vectors))
-    
- 
+
+
 
 
 def infty_space_to_dist(space):
