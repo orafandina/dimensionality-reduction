@@ -21,8 +21,7 @@ def is_metric_space(dists_matrix):
                     return(False)
     return(True)
    
-   
- 
+       
  
 # Constructs the gram matrix from the distance matrix, for checking PSD
 def Gram_matrix_from_dists(dists):
@@ -45,20 +44,22 @@ def is_pos_def(X):
 
 
 
-"Checking whether an input space is Euclidean."
+"Checks whether an input space is Euclidean."
 
 #input: distance matrix
 def is_Euclidean_space(dists):
     return(is_pos_def(Gram_matrix_from_dists(dists))) 
   
-""" 
-Returns the metric space, such that input_dists is its pairwise Euclidean distance matrix.
-Input: 
+
+def space_from_dists(input_dists):
+    """ 
+    Returns the metric space, such that input_dists is its pairwise Euclidean distance matrix.
+    Input: 
+        
+    input_dists: pairwise distances, assumed to be Euclidean distances
+               
+     """
     
-input_dists: pairwise distances, assumed to be Euclidean distances
-           
- """
- def space_from_dists(input_dists):
     Gram=Gram_matrix_from_dists(input_dists)
     eig_vals, eig_vectors=np.linalg.eigh(Gram)
     sqrt_eigs=np.sqrt(eig_vals)
@@ -67,17 +68,20 @@ input_dists: pairwise distances, assumed to be Euclidean distances
     U_matrix=np.transpose(eig_vectors)
     the_vectors=np.matmul(D_matrix, U_matrix)
     #The original vectors are the cols of the above matrix.ss
-    return np.transpose(the_vectors); 
+    return (np.transpose(the_vectors)); 
  
 
-"Computing l_p distance matrices, from a given vector space/"
+
 
 def space_to_dist(space):
+    
+    "Computing l_p distance matrices, from a given vector space"
+    
     dist=scipy.spatial.distance.pdist(space,metric='euclidean')
     matrix_dist=scipy.spatial.distance.squareform(dist)
     #answer=np.around(matrix_dist,8)
     #print("The distances are", matrix_dist)
-    return (matrix_dist);
+    return(matrix_dist);
 
 
 
@@ -100,8 +104,10 @@ def space_to_lp_dists(space,par):
 "Genearting random spaces."
 
 
-#Retruns a randomly generated vector space, of size and dimesnion dim, as numpy 2D array
 def get_random_space(size, dim):
+    """Retruns a randomly generated vector space, of size and dimesnion dim, as numpy 2D array
+  """
+    
     space=np.random.randn(size, dim)
     for i in range(size):
         sdv=np.random.randint(1,30)
@@ -113,25 +119,21 @@ def get_random_space(size, dim):
 
 
 
-
-
-""" Generates a non-Euclidean metric space that is "epsilon-close" to a given Euclidean space. 
-
-Input: distance matrix of a given Euclidean metric space, numpy 2D array. 
-Output: distance matrix of a non-Euclidean space, numpy 2D array
-        The resulting metric space is an epsilon close to the input space, i.e., can be embedded into it with 
-        distortion 1+epsilon.
-        The algorithm is randomized and it always outputs a valid metric space.
-        
-        There is some small probability that the output space is still a Euclidean space 
-        (if the input space was Euclidean). 
-        To reduce this probability we run the algorithm for several iterations (# T)
-
-NOTE: for some runs, the result of is_metric_space(output) can result in False, due to rounding issues. """
-
-"TODO: make it more efficient"
-
 def get_epsilon_close_metric(dists_matrix, epsilon, T):
+    """ Generates a non-Euclidean metric space that is "epsilon-close" to a given Euclidean space. 
+
+    Input: distance matrix of a given Euclidean metric space, numpy 2D array. 
+    Output: distance matrix of a non-Euclidean space, numpy 2D array
+            The resulting metric space is an epsilon close to the input space, i.e., can be embedded into it with 
+            distortion 1+epsilon.
+            The algorithm is randomized and it always outputs a valid metric space.
+            
+            There is some small probability that the output space is still a Euclidean space 
+            (if the input space was Euclidean). 
+            To reduce this probability we run the algorithm for several iterations (# T)
+
+    NOTE: for some runs, the result of is_metric_space(output) can result in False, due to rounding issues. """
+    
     copy_dists_matrix=np.copy(dists_matrix)
     [rows, cols]=dists_matrix.shape
 

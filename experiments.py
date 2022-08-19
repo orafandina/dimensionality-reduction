@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 #Classic embedding methods, to compare with
 from sklearn.random_projection import GaussianRandomProjection
 from sklearn.decomposition import PCA
-from sklearn.manifold import MDS
 from sklearn.manifold import TSNE
 
 
@@ -45,19 +44,34 @@ import approx_algo as AA
          embedded vector space """
 
 def JL_transf(space, k):
+    """ Input: 
+              space: vectors to embed 
+              k: new dimesnion       
+    
+    Returns embedded vector space"""
     transformer = GaussianRandomProjection(k)
     return transformer.fit_transform(space)
 
 
 def PCA_transf(space, k):
-    transformer = PCA(n_components=k, whiten = False,svd_solver='full')
+    """ Input: 
+              space: vectors to embed 
+              k: new dimesnion        
+              
+    Returns embedded vector space"""
+    transformer = PCA(n_components=k, whiten = False, svd_solver='full')
     return transformer.fit_transform(space)
 
 
 
 
 def TSNE_transf(space, k):
-    transformer = TSNE(n_components=k, metric='precomputed', method='exact')
+    """ Input: 
+              space: vectors to embed 
+              k: new dimesnion      
+              
+     Returns embedded vector space"""  
+    transformer = TSNE(n_components=k, init='random', learning_rate='auto', method='exact')
     return transformer.fit_transform(space)
 
 
@@ -66,28 +80,35 @@ def TSNE_transf(space, k):
 
 """ Experiments loops   """
 
-#MDS;SMACOF
 
-"""   
 
-Applies an embedidng on input_dists. Embeds into dimesnions in range_k array. Computes distortion of rank q.
-
-Inputs: input_dist - distance matrix of an input metric space 
- 
-        range_k - n array of dimesnions to embed into 
-        
-        q - distortion rank 
-        
-        measure_type - a string from {'lq_dist', 'REM', 'sigma'}
-        
-        embedding_type - a string from {'PCA', 'TSNE', 'JL', 'Approx_Algo'}, an embedding to apply
-        
-""" 
 
 
 
 
 def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_type, T=10):
+    
+    """   
+
+    Applies an embedidng on input_dists. Embeds into dimesnions in range_k array. Computes distortion of rank q.
+
+    Inputs: 
+        
+           input_dist: distance matrix of an input metric space 
+     
+            range_k:  n array of dimesnions to embed into 
+            
+            q:  distortion rank 
+            
+            measure_type:  a string from {'lq_dist', 'REM', 'sigma'}
+            
+            embedding_type:  a string from {'PCA', 'TSNE', 'JL', 'Approx_Algo'}, an embedding to apply
+            
+            T: the number of repetitions, if the applied embedding has a randomness (JL, TSNE)
+            
+    """ 
+
+    
     answer=np.zeros(range_k.shape)
     
     
@@ -111,12 +132,16 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
     
     if (embedding_type=='PCA' or embedding_type=='JL' or embedding_type=='TSNE'):
         input_space=ms.space_from_dists(input_dists)
-        distortion=0
         for i in range(len(range_k)):
-            for t in range(T):
-              distortion+=measure(input_dists, ms.space_to_dist(embedding(input_space, range_k[i])),q)  
-            answer[i]=distortion/T
-         
+            distortion=0
+            times=0
+            if(embedding_type=='PCA'):
+                times=1
+            else: 
+                times=T
+            for t in range(times):
+                distortion+=measure(input_dists, ms.space_to_dist(embedding(input_space, range_k[i])),q)
+            answer[i]=distortion/times
             
     else:
         distortion=0
@@ -127,10 +152,44 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
 
 # Plotting the results 
 
-        
-dists=ms.space_to_dist(ms.get_random_space(10,10))
-ms.new_func()
-ms.space_from_dists(dists)
-#print(run_dim_range_experiment(dists, np.array([3,6,8]), 3, 'lq_dist', 'JL'))    
-        
+def results_plot(range_k, distorts_embedding_list, measure_type):
+    plt.figure()
+    for i in range(len(distorts_embedding_list)):
+        distorts_to_plot=np.around(distorts_embedding_list[i][0],2)
+        label_str=distorts_embedding_list[i][1]
+        plt.plot(range_k, distorts_to_plot, label=label_str)
+    
+    plt.legend(loc="upper right")
+    plt.xlabel("new dimension")
+    plt.ylabel(measure_type)
+    plt.title("Comparing embedding methods: synthetic data")
+    plt.show()
+    return;
 
+
+
+
+
+
+""" A basic experiment, synthetic data.  
+
+Create a random space containing 100 point of dimension 100. Embed it into 10, 15 and 20 dimesnions
+with PCA, JL and TSNE algorithms. Compare l2-distortions.
+
+"""
+range_k=np.array([10,15,20])
+space=ms.get_random_space(100,100)
+dists=ms.space_to_dist(space)      
+JL_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'JL')
+PCA_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'PCA')
+TSNE_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'TSNE') 
+
+distorts=[JL_distorts, PCA_distorts, TSNE_distorts]
+
+embeddings=['JL','PCA','TSNE']
+dist_emb_list=list(zip(distorts, embeddings))
+results_plot(range_k, dist_emb_list, 'lq_dits')
+  
+
+     
+"""  Embedding real data sets.  """

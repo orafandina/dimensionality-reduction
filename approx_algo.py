@@ -75,7 +75,10 @@ def Approx_Algo(input_dists, new_dim, q):
 
 
     #The optimization objective function is l_q-distortion.
-    prob=cp.Problem(cp.Minimize(cp.Pnorm(M, p=q/2)),constraints)
+    if((q/2)==1):
+        prob=cp.Problem(cp.Minimize(cp.norm1(M)),constraints)
+    else: 
+        prob=cp.Problem(cp.Minimize(cp.Pnorm(M, p=q/2)),constraints)
     prob.solve()
 
     #After the optimization step, the matrix G contains the optimal pairwise Euclidean distances
