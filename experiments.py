@@ -1,47 +1,24 @@
 
-
 """
 Created on Wed August 10 13:15:37 2022
 
 @author: Ora Fandina
 """
+import numpy as np
 import matplotlib.pyplot as plt
-
-
-
-
 #Classic embedding methods, to compare with
 from sklearn.random_projection import GaussianRandomProjection
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
 
-
-import numpy as np
-
-
-
-
-
-
-#metric spaces and qaulit ymeasures of embedding methods
+#Local imports: metric spaces and qaulity measures of embedding methods
 import distortion_measures as dm
 import metric_spaces as ms
 import approx_algo as AA
 
 
-
 """ Setting up various embeddings  """
-
-
-
-
-""" Input: 
-          space: numpy array containing vectors of the space
-          k: int, number of dimensions to embed into
-         
-    Returns: 
-         embedded vector space """
 
 def JL_transf(space, k):
     """ Input: 
@@ -54,23 +31,11 @@ def JL_transf(space, k):
 
 
 def PCA_transf(space, k):
-    """ Input: 
-              space: vectors to embed 
-              k: new dimesnion        
-              
-    Returns embedded vector space"""
     transformer = PCA(n_components=k, whiten = False, svd_solver='full')
     return transformer.fit_transform(space)
 
 
-
-
-def TSNE_transf(space, k):
-    """ Input: 
-              space: vectors to embed 
-              k: new dimesnion      
-              
-     Returns embedded vector space"""  
+def TSNE_transf(space, k): 
     transformer = TSNE(n_components=k, init='random', learning_rate='auto', method='exact')
     return transformer.fit_transform(space)
 
@@ -79,12 +44,6 @@ def TSNE_transf(space, k):
 
 
 """ Experiments loops   """
-
-
-
-
-
-
 
 def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_type, T=10):
     
@@ -107,11 +66,7 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
             T: the number of repetitions, if the applied embedding has a randomness (JL, TSNE)
             
     """ 
-
-    
     answer=np.zeros(range_k.shape)
-    
-    
     measure_dict={
      'lq_dist': dm.lq_dist,
      'REM': dm.REM_q,
@@ -125,8 +80,7 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
             'TSNE': TSNE_transf,
             'JL': JL_transf,
             'Approx_Algo': AA.Approx_Algo
-    }
-    
+    } 
     embedding=embedding_dict[embedding_type]
     print('Experiment: embedding with', embedding_type)
     
@@ -146,7 +100,8 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
     else:
         distortion=0
         for i in range(len(range_k)):
-            answer[i]=measure(input_dists, ms.space_to_dist(embedding(input_dists, range_k[i],q)),q)
+            embedded=embedding(input_dists, range_k[i], q)
+            answer[i]=measure(input_dists, ms.space_to_dist(embedded),q)
     return(answer)    
          
 
@@ -166,15 +121,14 @@ def results_plot(range_k, distorts_embedding_list, measure_type):
     plt.show()
     return;
 
-
-
-
-
-
 """ A basic experiment, synthetic data.  
 
-Create a random space containing 100 point of dimension 100. Embed it into 10, 15 and 20 dimesnions
+Sample a random space containing 100 point of dimension 100. Embed it into 10, 15 and 20 dimesnions
 with PCA, JL and TSNE algorithms. Compare l2-distortions.
+
+"""
+
+
 
 """
 range_k=np.array([10,15,20])
@@ -190,6 +144,29 @@ embeddings=['JL','PCA','TSNE']
 dist_emb_list=list(zip(distorts, embeddings))
 results_plot(range_k, dist_emb_list, 'lq_dits')
   
+"""
+
+
+
+""" Synthetic data set, comparing our Approx Algo with PCA (commonly applied on non-Euclidean data).
+    Sample an epsilon-close non_Euclidean space containing 100 points. Apply PCA and Approx_Algo, embedding into
+    10, 15 and 20 dimensions. Compare l2-distortions.
+ """ 
+
+dists=ms.get_random_epsilon_close_non_Eucl(n=100, epsilon=0.8)
+
+range_k=np.array([3])
+Approx_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'Approx_Algo')
+print(Approx_distorts)
+PCA_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'PCA')
+distorts=[Approx_distorts,PCA_distorts]
+embeddings=['Approx_Algo','PCA']
+dist_emb_list=list(zip(distorts, embeddings))
+results_plot(range_k, dist_emb_list, 'lq_dits')
 
      
-"""  Embedding real data sets.  """
+"""  Embedding real data sets. 
+We experiment with MNIST and FASHION-MNIST for fun. How would you interpret the results?
+
+ """
+

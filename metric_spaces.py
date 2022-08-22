@@ -23,23 +23,21 @@ def is_metric_space(dists_matrix):
    
        
  
-# Constructs the gram matrix from the distance matrix, for checking PSD
+# Constructs the gram matrix from the squared distance matrix, for checking PSD/ the input is already squared 
 def Gram_matrix_from_dists(dists):
-    sq_dists=np.square(dists)
-    [rows,cols]=sq_dists.shape
-    sq_norms=sq_dists[0] #first row contains squared norms, i.e., distances from x_0=0 vector by assumption    
+    [rows,cols]=dists.shape
+    sq_norms=dists[0] #first row contains squared norms, i.e., distances from x_0=0 vector by assumption    
     norms_matrix=np.tile(sq_norms, (rows, 1))
     sum_norms=np.zeros((rows,cols))
     for i in range(1,cols):
         sum_norms[i]=np.copy(np.full(cols,sq_norms[i]))
-    G_matrix=(1/2)*(norms_matrix+sum_norms-sq_dists)
+    G_matrix=(1/2)*(norms_matrix+sum_norms-dists)
     return(G_matrix)    
     
 
 
 #Checks if the input matrix is positive semi definite
 def is_pos_def(X):
-    print(np.linalg.eigvalsh(X))
     return (np.all(np.linalg.eigvalsh(X) >= 0));
 
 
@@ -51,26 +49,38 @@ def is_Euclidean_space(dists):
     return(is_pos_def(Gram_matrix_from_dists(dists))) 
   
 
-def space_from_dists(input_dists):
+def space_from_dists(input_dists, squared=False):
     """ 
     Returns the metric space, such that input_dists is its pairwise Euclidean distance matrix.
     Input: 
         
     input_dists: pairwise distances, assumed to be Euclidean distances
+                 
+    squared: bool, indicates if the distances are squared     
                
-     """
-    
-    Gram=Gram_matrix_from_dists(input_dists)
-    eig_vals, eig_vectors=np.linalg.eigh(Gram)
-    sqrt_eigs=np.sqrt(eig_vals)
+     """       
+    if(squared==True):
+        dists=input_dists
+    else:
+        dists=np.square(input_dists)
+    Gram=Gram_matrix_from_dists(dists)
+    if(~is_pos_def(Gram)):
+        print('Warrning: The distance matrix is non-Euclidean, an approximation will be returned.')
+    return(space_from_Gram(Gram, is_pos_def(Gram)))
+ 
+
+def space_from_Gram(Gram_matrix, is_PSD=True):
+    eig_vals, eig_vectors=np.linalg.eigh(Gram_matrix)
+    if(is_PSD==False):
+        sqrt_eigs=np.sqrt(np.abs(eig_vals))
+    else:
+        sqrt_eigs=np.sqrt(eig_vals)
     D_matrix=np.diag(sqrt_eigs)
     #The rows of U should be the orthonormal basis of the eig_vectors.
     U_matrix=np.transpose(eig_vectors)
     the_vectors=np.matmul(D_matrix, U_matrix)
     #The original vectors are the cols of the above matrix.ss
-    return (np.transpose(the_vectors)); 
- 
-
+    return (np.transpose(the_vectors));
 
 
 def space_to_dist(space):
@@ -185,6 +195,7 @@ def get_epsilon_close_metric(dists_matrix, epsilon, T):
 
 
 #COMMENTS: from our random space, loop the above code until you get a non-Euclidean result
+#Returns distance matrix
 def get_random_epsilon_close_non_Eucl(n, epsilon):
     original=get_random_space(n,n)
     original_Eucl_dists=space_to_dist(original)
