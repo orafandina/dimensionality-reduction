@@ -153,20 +153,28 @@ results_plot(range_k, dist_emb_list, 'lq_dits')
     10, 15 and 20 dimensions. Compare l2-distortions.
  """ 
 
-dists=ms.get_random_epsilon_close_non_Eucl(n=100, epsilon=0.8)
-
-range_k=np.array([3])
-Approx_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'Approx_Algo')
-print(Approx_distorts)
-PCA_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'PCA')
-distorts=[Approx_distorts,PCA_distorts]
-embeddings=['Approx_Algo','PCA']
-dist_emb_list=list(zip(distorts, embeddings))
-results_plot(range_k, dist_emb_list, 'lq_dits')
+dists=ms.get_random_epsilon_close_non_Eucl(n=50, epsilon=0.3)
+#print(dists)
+#space=ms.get_random_space(100, 100)
+#dists=ms.space_to_dist(space)
+#dists=ms.infty_space_to_dist(space)
+#range_k=np.array([3])
+#Approx_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'Approx_Algo')
+#print(Approx_distorts)
+#PCA_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'PCA')
+#distorts=[Approx_distorts,PCA_distorts]
+#embeddings=['Approx_Algo','PCA']
+#dist_emb_list=list(zip(distorts, embeddings))
+#results_plot(range_k, dist_emb_list, 'lq_dits')
 
      
 """  Embedding real data sets. 
 We experiment with MNIST and FASHION-MNIST for fun. How would you interpret the results?
 
  """
+ 
+#Compare ours with pymde? on which data sets? real with ours synthetic?
+#run ours on MNIST 
+
+ 
 
