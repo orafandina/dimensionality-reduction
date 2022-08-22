@@ -173,12 +173,14 @@ def get_epsilon_close_metric(dists_matrix, epsilon, T):
 
  
 #loop the above code until you get a non-Euclidean space us a result.
-#Returns distance matrix of the generated space
+#Returns distance matrix of the generated space. Bounded to execute at most 50 tries, enough with high probability.
 def get_random_epsilon_close_non_Eucl(n, epsilon):
+    Tries=1
     original=get_random_space(n,n)
     original_Eucl_dists=space_to_dist(original)
     distorted_dists=get_epsilon_close_metric(original_Eucl_dists, epsilon, 5)
-    while(is_Euclidean_space(distorted_dists)==True):
+    while(is_Euclidean_space(distorted_dists) and Tries<=50):
+        Tries+=1
         print('trying out a new while loop')
         original=get_random_space(n,n)
         original_Eucl_dists=space_to_dist(original)
