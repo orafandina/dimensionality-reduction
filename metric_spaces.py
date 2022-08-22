@@ -1,15 +1,14 @@
 
+""" 
 
-""" Metric spaces: creating, testing for being valid, Euclidean, non-Euclidean, etc.  """
+Created on July 2021, by Ora Fandina.
+
+Metric spaces: creating, testing for being valid, Euclidean, non-Euclidean, etc.  """
 
 
 import numpy as np
 import scipy
 import scipy.spatial
-
-
-
-
 
 "Verifies the triangle inequality. "
 def is_metric_space(dists_matrix):
@@ -22,31 +21,26 @@ def is_metric_space(dists_matrix):
     return(True)
    
        
- 
-# Constructs the gram matrix from the squared distance matrix, for checking PSD/ the input is already squared 
-def Gram_matrix_from_dists(dists):
-    [rows,cols]=dists.shape
-    sq_norms=dists[0] #first row contains squared norms, i.e., distances from x_0=0 vector by assumption    
+# Constructs the gram matrix from the squared distance matrix, for checking PSD, the input is already squared 
+def Gram_matrix_from_dists(sq_dists):
+    [rows,cols]=sq_dists.shape
+    sq_norms=sq_dists[0] #first row contains squared norms, i.e., distances from x_0=0 vector by assumption    
     norms_matrix=np.tile(sq_norms, (rows, 1))
     sum_norms=np.zeros((rows,cols))
     for i in range(1,cols):
         sum_norms[i]=np.copy(np.full(cols,sq_norms[i]))
-    G_matrix=(1/2)*(norms_matrix+sum_norms-dists)
+    G_matrix=(1/2)*(norms_matrix+sum_norms-sq_dists)
     return(G_matrix)    
     
-
 
 #Checks if the input matrix is positive semi definite
 def is_pos_def(X):
     return (np.all(np.linalg.eigvalsh(X) >= 0));
 
 
-
-"Checks whether an input space is Euclidean."
-
 #input: distance matrix
 def is_Euclidean_space(dists):
-    return(is_pos_def(Gram_matrix_from_dists(dists))) 
+    return(is_pos_def(Gram_matrix_from_dists(dists**2))) 
   
 
 def space_from_dists(input_dists, squared=False):
@@ -84,18 +78,13 @@ def space_from_Gram(Gram_matrix, is_PSD=True):
 
 
 def space_to_dist(space):
-    
-    "Computing l_p distance matrices, from a given vector space"
+    "Comoutes l_p distance matrices, from a given vector space"
     
     dist=scipy.spatial.distance.pdist(space,metric='euclidean')
     matrix_dist=scipy.spatial.distance.squareform(dist)
     #answer=np.around(matrix_dist,8)
     #print("The distances are", matrix_dist)
     return(matrix_dist);
-
-
-
-
 
 
 def infty_space_to_dist(space):
@@ -110,9 +99,7 @@ def space_to_lp_dists(space,par):
     return(answer);
 
 
-
-"Genearting random spaces."
-
+"Genearting synthetic random spaces."
 
 def get_random_space(size, dim):
     """Retruns a randomly generated vector space, of size and dimesnion dim, as numpy 2D array
@@ -125,16 +112,12 @@ def get_random_space(size, dim):
     return(space);
 
 
-
-
-
-
 def get_epsilon_close_metric(dists_matrix, epsilon, T):
     """ Generates a non-Euclidean metric space that is "epsilon-close" to a given Euclidean space. 
 
     Input: distance matrix of a given Euclidean metric space, numpy 2D array. 
     Output: distance matrix of a non-Euclidean space, numpy 2D array
-            The resulting metric space is an epsilon close to the input space, i.e., can be embedded into it with 
+            The resulting metric space is epsilon-close to the input space, i.e., can be embedded into it with 
             distortion 1+epsilon.
             The algorithm is randomized and it always outputs a valid metric space.
             
@@ -144,63 +127,59 @@ def get_epsilon_close_metric(dists_matrix, epsilon, T):
 
     NOTE: for some runs, the result of is_metric_space(output) can result in False, due to rounding issues. """
     
-    copy_dists_matrix=np.copy(dists_matrix)
+    copy_dists=np.copy(dists_matrix)
     [rows, cols]=dists_matrix.shape
 
     #The distorted metric space
-    generated_metric_dists=np.zeros((rows, cols))
+    generated_metric=np.zeros((rows, cols))
+    
     for i in range(rows):
-        for j in range(i+1, rows):
-            lower_range=[]
-            upper_range=[]
-            for k in range(rows):
-                if (k!=i and k!=j):
-                    min_z=min(copy_dists_matrix[i,k], copy_dists_matrix[j,k])
-                    max_z=max(copy_dists_matrix[i,k], copy_dists_matrix[j,k])
-                    lower_range.append(max_z-min_z)
-                    upper_range.append(max_z+min_z)
-                    continue
-            lower_array=np.array(lower_range)
-            upper_array=np.array(upper_range)
-            min_new=np.amax(lower_range)
-            max_new=np.amin(upper_range)
-            r=copy_dists_matrix[i,j]
-            Finish=False
-            possible_new_dists=[]
-            for t in range(T):
-                noise=np.random.normal(0, epsilon)
-                if (noise>=0):
-                    factor=1+noise
-                else:
-                    factor=1/(1-noise)
-                r_new=factor*r
-                if (r_new>=min_new and r_new<=max_new):
-                    Finish=True
-                    possible_new_dists.append(r_new)
-            if(Finish==True):
-                new_dist=possible_new_dists[0]
+        for j in range(i+1, cols):
+            upper_range=copy_dists[i]+copy_dists[j]
+            lower_range=np.abs(copy_dists[i]-copy_dists[j])
+            #considel only triangles i,j,k with all different vertices
+            excptIndx=[i,j]
+            mask=np.ones(cols, dtype=bool)
+            mask[excptIndx]=False
+            largest_value=np.amin(upper_range[mask])
+            smallest_value=np.amax(lower_range[mask])
+            r=copy_dists[i][j]
+            #need to randomly pick a number from [smallest, largest] which is 1+-eps close to r
+            t=1
+            noise=np.random.normal(0, epsilon)
+            if (noise>=0):
+                factor=1+noise
             else:
-                new_dist=min_new
-            generated_metric_dists[i,j]=new_dist
-            generated_metric_dists[j,i]=new_dist
-            copy_dists_matrix[i,j]=new_dist
-            copy_dists_matrix[j,i]=new_dist
-    return(generated_metric_dists)
+                factor=1/(1-noise)
+            r_new=factor*r
+            while((r_new< smallest_value or r_new >largest_value) and t<=T):
+                 t+=1
+                 noise=np.random.normal(0, epsilon)
+                 if (noise>=0):
+                     factor=1+noise
+                 else:
+                     factor=1/(1-noise)
+                 r_new=factor*r
+            if(r_new>=smallest_value and r_new <=largest_value):
+                new_dist=r_new
+            else:
+                r_new=smallest_value
+            generated_metric[i,j]=new_dist
+            generated_metric[j,i]=new_dist
+            copy_dists[i,j]=new_dist
+            copy_dists[j,i]=new_dist
+    return(generated_metric)
 
 
  
-
-
-
-
-
-#COMMENTS: from our random space, loop the above code until you get a non-Euclidean result
-#Returns distance matrix
+#loop the above code until you get a non-Euclidean space us a result.
+#Returns distance matrix of the generated space
 def get_random_epsilon_close_non_Eucl(n, epsilon):
     original=get_random_space(n,n)
     original_Eucl_dists=space_to_dist(original)
     distorted_dists=get_epsilon_close_metric(original_Eucl_dists, epsilon, 5)
-    while(is_Euclidean_space(distorted_dists**2)==True):
+    while(is_Euclidean_space(distorted_dists)==True):
+        print('trying out a new while loop')
         original=get_random_space(n,n)
         original_Eucl_dists=space_to_dist(original)
         distorted_dists=get_epsilon_close_metric(original_Eucl_dists, epsilon, 2)
