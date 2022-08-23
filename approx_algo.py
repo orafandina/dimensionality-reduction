@@ -65,9 +65,9 @@ def Approx_Algo(input_dists, new_dim, q):
         prob=cp.Problem(cp.Minimize(cp.norm1(M)),constraints)
     else: 
         prob=cp.Problem(cp.Minimize(cp.Pnorm(M, p=q/2)),constraints)
-    print('getting into solving the problem...')
+    print('Solving the cvxpy problem ...')
     prob.solve(solver='SCS')
-    print('the problem is solved! continuing to tne next steps')
+    print('The problem has been solved, continuing to the RP step')
     recov_vecs=ms.space_from_Gram(G.value, ms.is_pos_def(G.value))     
 
     #Step 2

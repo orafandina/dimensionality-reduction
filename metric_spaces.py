@@ -185,6 +185,8 @@ def get_random_epsilon_close_non_Eucl(n, epsilon):
         original=get_random_space(n,n)
         original_Eucl_dists=space_to_dist(original)
         distorted_dists=get_epsilon_close_metric(original_Eucl_dists, epsilon, 2)
+    if(Tries==50):
+        print('Warrning: get_random_epsilon_close_non_Eucl -- might have generated a Euclidean space, verify.')
     return(distorted_dists)
 
 
