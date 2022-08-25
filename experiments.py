@@ -121,6 +121,8 @@ def results_plot(range_k, distorts_embedding_list, measure_type):
     plt.show()
     return;
 
+
+
 """ A basic experiment, synthetic data.  
 
 Sample a random space containing 100 point of dimension 100. Embed it into 10, 15 and 20 dimesnions
@@ -130,7 +132,7 @@ with PCA, JL and TSNE algorithms. Compare l2-distortions.
 
 
 
-"""
+
 range_k=np.array([10,15,20])
 space=ms.get_random_space(100,100)
 dists=ms.space_to_dist(space)      
@@ -144,7 +146,6 @@ embeddings=['JL','PCA','TSNE']
 dist_emb_list=list(zip(distorts, embeddings))
 results_plot(range_k, dist_emb_list, 'lq_dits')
   
-"""
 
 
 
@@ -153,28 +154,38 @@ results_plot(range_k, dist_emb_list, 'lq_dits')
     10, 15 and 20 dimensions. Compare l2-distortions.
  """ 
 
-dists=ms.get_random_epsilon_close_non_Eucl(n=50, epsilon=0.3)
-#print(dists)
-#space=ms.get_random_space(100, 100)
-#dists=ms.space_to_dist(space)
-#dists=ms.infty_space_to_dist(space)
-#range_k=np.array([3])
-#Approx_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'Approx_Algo')
-#print(Approx_distorts)
-#PCA_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'PCA')
-#distorts=[Approx_distorts,PCA_distorts]
-#embeddings=['Approx_Algo','PCA']
-#dist_emb_list=list(zip(distorts, embeddings))
-#results_plot(range_k, dist_emb_list, 'lq_dits')
+dists=ms.get_random_epsilon_close_non_Eucl(n=50, epsilon=0.8)
+
+range_k=np.array([3,5,7])
+Approx_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'Approx_Algo')
+
+PCA_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'PCA')
+distorts=[Approx_distorts,PCA_distorts]
+embeddings=['Approx_Algo','PCA']
+dist_emb_list=list(zip(distorts, embeddings))
+results_plot(range_k, dist_emb_list, 'lq_dits')
 
      
-"""  Embedding real data sets. 
-We experiment with MNIST and FASHION-MNIST for fun. How would you interpret the results?
-
+"""  Embedding real data sets. Just play with different data sets available in torchvision, for example.
  """
  
-#Compare ours with pymde? on which data sets? real with ours synthetic?
-#run ours on MNIST 
+ 
+
+#LOADING MNIST to numpy 
+import torch
+import torchvision
+from torchvision import datasets, transforms
+
+k,q=4,2
+train_set = datasets.MNIST('./data', train=True, download=True)
+
+train_set_array=train_set.data.numpy()
+space_all=np.reshape(train_set_array, (60000, 784))
+space=space_all[:1000,:785] #extracting the first 1000 points for the data set
+dists=ms.space_to_dist(space)
+new_space=AA.Approx_Algo(dists, k, q)
+
+
 
  
 
