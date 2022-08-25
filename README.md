@@ -24,8 +24,9 @@ where $OPT$ is the $l_q$-distortion of the **optimal** embedding of $X$ into a $
 
 The algorithm works in two steps: 
 
-1. FComputes an optimal embedding of $X$ into a high dimensional Euclidean space. The optimality is in the sense of preserving the $l_q$ - distortion. In this step the dimension of the resulting vectors is not restricted, and will be of dimesnion $n$ which is the number of the points in the input metric space $X$. To find such an embedding, we write the appropriate convex optimization program and solve it with the solver implemnted in the cvxpy python package.   
+1. Computes an optimal embedding of $X$ into a high dimensional Euclidean space. The optimality is in the sense of preserving the $l_q$ - distortion. In this step the dimension of the resulting vectors is not restricted, and will be of dimesnion $n$ which is the number of the points in the input metric space $X$. To find such an embedding, we write the appropriate convex optimization program and solve it with the solver implemnted in the cvxpy python package. 
 
+Note: the running time is pretty slow for this step. In the future versions we will implement this step with pytorch functionality.
    
 2. Next, we aplly the JL projection method to reuce the dimesnion of the output set from the first setp. We embed the vectors into $k$ - dimensions. 
    The projection method used is the Gaussian matrix based, which is crucial and necessary to the guarantees to be true as proved in our paper.
@@ -34,7 +35,7 @@ We give here the implementation for optimizing the lq_distortion, while optimizi
 
 ## Requirements
 
-``` pip install cvxpy ```
+[CVXPY](https://www.cvxpy.org/index.html) 
 
 
 ## Metric Spaces 
