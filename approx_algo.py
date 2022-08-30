@@ -160,7 +160,7 @@ def solve_optim_stress(input_dists, q):
     constraints=constraints+[G_expression.T + G_expression - 2*G==Z]
     
     #matrix of additive distorts, (sqrt(z_ij)/d_ij-1)== sqrt(Expans)-1
-    obj_expression=Z-input_dists**2
+    obj_expression=cp.abs(Z-input_dists**2)
     if(q==1):
         prob=cp.Problem(cp.Minimize(cp.norm1(obj_expression)),constraints)
     else:
