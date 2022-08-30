@@ -48,9 +48,11 @@ def space_from_dists(input_dists, squared=False):
     Returns the metric space, such that input_dists is its pairwise Euclidean distance matrix.
     Input: 
         
-    input_dists: pairwise distances, assumed to be Euclidean distances
+        input_dists: pairwise distances, assumed to be Euclidean distances
                  
-    squared: bool, indicates if the distances are squared     
+        squared: bool, indicates if the distances are squared  
+        
+    Rises warning if the input matrix is not PSD     
                
      """       
     if(squared==True):
@@ -59,7 +61,7 @@ def space_from_dists(input_dists, squared=False):
         dists=np.square(input_dists)
     Gram=Gram_matrix_from_dists(dists)
     if(~is_pos_def(Gram)):
-        print('Warrning: The distance matrix is non-Euclidean, an approximation will be returned.')
+        print('Warrning: metric_spaces: space_from_dists The distance matrix is non-Euclidean, an approximation will be returned.')
     return(space_from_Gram(Gram, is_pos_def(Gram)))
  
 

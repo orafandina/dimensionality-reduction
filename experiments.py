@@ -59,7 +59,7 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
             
             q:  distortion rank 
             
-            measure_type:  a string from {'lq_dist', 'REM', 'sigma'}
+            measure_type:  a string from {'lq_dist', 'REM', 'sigma', 'energy', 'stress'}
             
             embedding_type:  a string from {'PCA', 'TSNE', 'JL', 'Approx_Algo'}, an embedding to apply
             
@@ -67,10 +67,13 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
             
     """ 
     answer=np.zeros(range_k.shape)
+    
     measure_dict={
      'lq_dist': dm.lq_dist,
      'REM': dm.REM_q,
-     'sigma': dm.sigma_q
+     'sigma': dm.sigma_q,
+     'energy': dm.energy, 
+     'stress': dm.stress 
     }
     
     measure=measure_dict[measure_type]
@@ -82,7 +85,8 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
             'Approx_Algo': AA.Approx_Algo
     } 
     embedding=embedding_dict[embedding_type]
-    print('Experiment: embedding with', embedding_type)
+    print('Experiment: embedding with', embedding_type, ', measuring with', measure_type)
+
     
     if (embedding_type=='PCA' or embedding_type=='JL' or embedding_type=='TSNE'):
         input_space=ms.space_from_dists(input_dists)
@@ -100,14 +104,14 @@ def run_dim_range_experiment(input_dists, range_k, q, measure_type, embedding_ty
     else:
         distortion=0
         for i in range(len(range_k)):
-            embedded=embedding(input_dists, range_k[i], q)
+            embedded=embedding(input_dists, range_k[i], q, measure_type)
             answer[i]=measure(input_dists, ms.space_to_dist(embedded),q)
     return(answer)    
          
 
 # Plotting the results 
 
-def results_plot(range_k, distorts_embedding_list, measure_type):
+def results_plot(range_k, distorts_embedding_list, measure_type,order):
     plt.figure()
     for i in range(len(distorts_embedding_list)):
         distorts_to_plot=np.around(distorts_embedding_list[i][0],2)
@@ -116,35 +120,39 @@ def results_plot(range_k, distorts_embedding_list, measure_type):
     
     plt.legend(loc="upper right")
     plt.xlabel("new dimension")
-    plt.ylabel(measure_type)
+    plt.ylabel(measure_type+': q='+str(order))
     plt.title("Comparing embedding methods: synthetic data")
     plt.show()
     return;
 
 
 
+
+
+
 """ A basic experiment, synthetic data.  
 
 Sample a random space containing 100 point of dimension 100. Embed it into 10, 15 and 20 dimesnions
-with PCA, JL and TSNE algorithms. Compare l2-distortions.
+with PCA, JL and Approx_Algo algorithms. Compare energy_2 error. Note that in this setup Approx_Algo and JL
+should return essentially the same reuslt, beating the other PR methods as we formally prove in the paper.
 
 """
 
-
-
+q=2
+measure_type='energy'
 
 range_k=np.array([10,15,20])
 space=ms.get_random_space(100,100)
 dists=ms.space_to_dist(space)      
-JL_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'JL')
-PCA_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'PCA')
-TSNE_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'TSNE') 
+JL_distorts=run_dim_range_experiment(dists, range_k, q, measure_type, 'JL')
+PCA_distorts=run_dim_range_experiment(dists, range_k, q, measure_type, 'PCA')
+Approx_distorts=run_dim_range_experiment(dists, range_k, q, measure_type, 'Approx_Algo') 
 
-distorts=[JL_distorts, PCA_distorts, TSNE_distorts]
+distorts=[JL_distorts, PCA_distorts, Approx_distorts]
 
-embeddings=['JL','PCA','TSNE']
+embeddings=['JL','PCA','Approx_Algo']
 dist_emb_list=list(zip(distorts, embeddings))
-results_plot(range_k, dist_emb_list, 'lq_dits')
+results_plot(range_k, dist_emb_list, measure_type,q)
   
 
 
@@ -153,28 +161,28 @@ results_plot(range_k, dist_emb_list, 'lq_dits')
     Sample an epsilon-close non_Euclidean space containing 100 points. Apply PCA and Approx_Algo, embedding into
     10, 15 and 20 dimensions. Compare l2-distortions.
  """ 
-
+q=2
+measure_type='stress'
 dists=ms.get_random_epsilon_close_non_Eucl(n=50, epsilon=0.8)
 
 range_k=np.array([3,5,7])
-Approx_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'Approx_Algo')
+Approx_distorts=run_dim_range_experiment(dists, range_k, q, measure_type, 'Approx_Algo')
 
-PCA_distorts=run_dim_range_experiment(dists, range_k, 2, 'lq_dist', 'PCA')
+PCA_distorts=run_dim_range_experiment(dists, range_k, q, measure_type, 'PCA')
 distorts=[Approx_distorts,PCA_distorts]
 embeddings=['Approx_Algo','PCA']
 dist_emb_list=list(zip(distorts, embeddings))
-results_plot(range_k, dist_emb_list, 'lq_dits')
+results_plot(range_k, dist_emb_list, measure_type,q)
 
-     
+
+
+      
 """  Embedding real data sets. Just play with different data sets available in torchvision, for example.
- """
- 
- 
+  """
+  
 
 #LOADING MNIST to numpy 
-import torch
-import torchvision
-from torchvision import datasets, transforms
+from torchvision import datasets
 
 k,q=4,2
 train_set = datasets.MNIST('./data', train=True, download=True)
