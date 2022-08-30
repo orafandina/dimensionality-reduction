@@ -49,7 +49,7 @@ We give here the implementation for optimizing the lq_distortion, while optimizi
 
 ## Jupyter notebook for a quck interaction with the code 
 
-The notebook version of the code, with step by step instructions is in `embedding.ipynb`.
+The notebook `examples.ipynb` contains multiple examples of applying and comparing our algorithm with various popular embedding methods. 
 
 
 
